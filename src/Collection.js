@@ -12,6 +12,7 @@ class Collection {
 
   // default regex matches an uuid
   id_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  default_sort = null;
 
   constructor(store: Store, table: string, schema: SchemaDefinition) {
     this.store = store;
@@ -38,8 +39,16 @@ class Collection {
   }
 
   find(query?: ?Object, context: Context): Promise<Array<Object>> {
-    const { offset = 0, limit = 100 } = context.req.query;
+    const { offset = 0, limit = 100, sort = this.default_sort } = context.req.query;
     let tmp = this.store.db(this.table).select('*').limit(limit).offset(offset);
+
+    if(sort) {
+      if(sort[0] === '-') {
+        tmp.orderBy(sort.substring(1), 'desc');
+      } else {
+        tmp.orderBy(sort, 'asc');
+      }
+    }
 
     if (query) {
       tmp = tmp.where(query);
