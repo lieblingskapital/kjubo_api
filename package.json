@@ -53,9 +53,7 @@
     "flow-typed": "^2.1.5",
     "jest": "^20.0.4"
   },
-  "peerDependencies": {
-    
-  },
+  "peerDependencies": {},
   "dependencies": {
     "@kjubo/schema": "^1.0.1",
     "jsonwebtoken": "^7.4.2",
