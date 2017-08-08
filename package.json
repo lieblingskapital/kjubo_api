@@ -1,6 +1,6 @@
 {
   "name": "@kjubo/api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "express middleware for fast and easy api creation",
   "main": "lib/index.js",
   "scripts": {
