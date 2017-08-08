@@ -203,16 +203,27 @@ class Store {
           /* eslint-enable */
         } else if (field instanceof LinksField) {
           const otherParamName = this.names.get(field.collection);
+          const otherCollection = this.collections.get(field.collection);
 
           /* eslint-disable no-unused-vars, arrow-body-style */
           router.get(`/${name}/:${paramName}/${field.name}`, Store.wrapper(async (req, res) => {
-            return this
+            const result = await this
               // $FlowIgnore
               .db(field.tablename)
               .select('*')
               .where({ [paramName]: req.params[paramName].id })
-              // eslint-disable-next-line no-param-reassign
-              .map((i) => { delete i[paramName]; return i; });
+
+            if (typeof req.query.resolve === 'undefined') return result;
+
+            return Promise.all(
+              result.map(async ({ [otherParamName]: id, ...other }) => {
+                const item = await otherCollection.get(id);
+                return {
+                  [otherParamName]: item,
+                  ...other,
+                };
+              })
+            );
           }));
 
           router.post(`/${name}/:${paramName}/${field.name}`, Store.wrapper(async (req, res) => {
