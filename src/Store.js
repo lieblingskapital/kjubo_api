@@ -45,8 +45,8 @@ class Store {
         const result = await handler(req, res);
         return res.status(200).json({
           status: 200,
-          limit: result.limit,
-          offset: result.offset,
+          limit: result ? result.limit : undefined,
+          offset: result ? result.offset : undefined,
           data: result,
         });
       } catch (err) {

@@ -1,14 +1,18 @@
 // @flow
 
-import { Schema, type SchemaDefinition, ValidationResult, ValidationError } from '@kjubo/schema';
+import { Schema, type SchemaDefinition, ValidationResult} from '@kjubo/schema';
 import type Context from './Context';
 
+
 import Store from './Store';
+import ValidationError from './errors/ValidationError';
 
 class Collection {
   store: Store;
   table: string;
   schema: Schema;
+
+  static ValidationError = ValidationError;
 
   // default regex matches an uuid
   id_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -69,6 +73,7 @@ class Collection {
     const result = await this.schema.validate(item);
 
     if (result.hasErrors()) {
+      debugger;
       throw new ValidationError(result.getErrors());
     }
 

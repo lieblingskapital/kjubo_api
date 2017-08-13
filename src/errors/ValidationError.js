@@ -2,11 +2,12 @@
 
 import ExtendableError from './ExtendableError';
 
-export default class ValidationError extends ExtendableError {
+export default class ValidationError {
   errors: Object;
+  message: string;
 
   constructor(errors: Object) {
-    super('Validation failed');
+    this.message = 'Validation Failed';
     this.errors = errors;
   }
 }
