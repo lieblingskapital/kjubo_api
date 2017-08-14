@@ -206,7 +206,7 @@ class Store {
           }));
 
           router.get(`/${name}/:${paramName}/${otherParamName}`, Store.wrapper(async (req, res) => {
-            return otherCollection.get(req.params[paramName].source, new Context(req, res, 1));
+            return otherCollection.get(req.params[paramName][field.name], new Context(req, res, 1));
           }));
           /* eslint-enable */
         } else if (field instanceof LinksField) {
