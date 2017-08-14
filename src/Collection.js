@@ -55,15 +55,16 @@ class Collection {
     }
 
     if (query) {
-      const q = Array.from(this.schema.fields.keys()).reduce((prev, curr) => {
-        if (typeof query[curr] !== 'undefined') {
-          prev[curr] = query[curr];
+      Array.from(this.schema.fields.keys()).forEach((field) => {
+        if (typeof query[field] === 'undefined') return;
+
+        const operator = query[field][0];
+        if (operator === '%') {
+          tmp.where(field, '%', query[field].substring(1));
+        } else {
+          tmp.where(field, query[field]);
         }
-        return prev;
-      }, {});
-      if (Object.keys(q).length) {
-        tmp = tmp.where(q);
-      }
+      });
     }
 
     return tmp
