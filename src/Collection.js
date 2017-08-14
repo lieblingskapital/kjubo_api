@@ -1,6 +1,6 @@
 // @flow
 
-import { Schema, type SchemaDefinition, ValidationResult} from '@kjubo/schema';
+import { Schema, type SchemaDefinition, ValidationResult } from '@kjubo/schema';
 import type Context from './Context';
 
 
@@ -46,8 +46,8 @@ class Collection {
     const { offset = 0, limit = 100, sort = this.default_sort } = context.req.query;
     let tmp = this.store.db(this.table).select('*').limit(limit).offset(offset);
 
-    if(sort) {
-      if(sort[0] === '-') {
+    if (sort) {
+      if (sort[0] === '-') {
         tmp.orderBy(sort.substring(1), 'desc');
       } else {
         tmp.orderBy(sort, 'asc');
@@ -55,7 +55,15 @@ class Collection {
     }
 
     if (query) {
-      tmp = tmp.where(query);
+      const q = Array.from(this.schema.fields.keys()).reduce((prev, curr) => {
+        if (typeof query[curr] !== 'undefined') {
+          prev[curr] = query[curr];
+        }
+        return prev;
+      }, {});
+      if (Object.keys(q).length) {
+        tmp = tmp.where(q);
+      }
     }
 
     return tmp
@@ -73,7 +81,6 @@ class Collection {
     const result = await this.schema.validate(item);
 
     if (result.hasErrors()) {
-      debugger;
       throw new ValidationError(result.getErrors());
     }
 
@@ -91,6 +98,65 @@ class Collection {
         return this.store.db(this.table)
           .insert(insert)
           .returning('*')
+          .then(tmp => this.onGet(tmp[0], context),
+          err => {
+            if (err.condition !== 'unique_violation') throw err;
+
+            throw new ValidationError({
+              _constraint: 'Item does not match unique constraint',
+            });
+          });
+      });
+  }
+
+  async update(item: Object, body: Object, context: Context) {
+    const result = await this.schema.validate(body);
+
+    if (result.hasErrors()) {
+      throw new ValidationError(result.getErrors());
+    }
+
+    return this
+      .onUpdate(result.getValues(), context)
+      .then((_item) => {
+        if (!_item) throw new Error('Item can not be empty');
+        return this.store.db(this.table)
+          .update(Object.keys(_item).reduce((prev, curr) => {
+            if (typeof _item[curr] !== 'undefined') {
+              // eslint-disable-next-line no-param-reassign
+              prev[curr] = _item[curr];
+            }
+            return prev;
+          }, {}))
+          .where('id', item.id)
+          .returning('*')
+          .then(tmp => this.onGet(tmp[0], context));
+      });
+  }
+
+  async patch(item: Object, body: Object, context: Context) {
+    const result = await this.schema.validate(body, true);
+
+    if (result.hasErrors()) {
+      throw new ValidationError(result.getErrors());
+    }
+
+    return this
+      .onPatch(item, result.getValues(), context)
+      .then((_item) => {
+        if (!_item) throw new Error('Item can not be empty');
+        const patch = Object.keys(_item).reduce((prev, curr) => {
+          if (typeof _item[curr] !== 'undefined') {
+            // eslint-disable-next-line no-param-reassign
+            prev[curr] = _item[curr];
+          }
+          return prev;
+        }, {});
+        if (!Object.keys(patch).length) return item;
+        return this.store.db(this.table)
+          .update(patch)
+          .where('id', item.id)
+          .returning('*')
           .then(tmp => this.onGet(tmp[0], context));
       });
   }
@@ -105,8 +171,24 @@ class Collection {
     return Promise.resolve(item);
   }
 
+  async onUpdate(item: Object, context: Context): Promise<Object> {
+    return Promise.resolve(item);
+  }
+
+  async onPatch(item: Object, patch: Object, context: Context): Promise<Object> {
+    return Promise.resolve(item);
+  }
+
   onHTTPPost(context: Context) {
     return this.create(context.req.body, context);
+  }
+
+  onHTTPPut(item: Object, context: Context) {
+    return this.update(item, context.req.body, context);
+  }
+
+  onHTTPPatch(item: Object, context: Context) {
+    return this.patch(item, context.req.body, context);
   }
 }
 

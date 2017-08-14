@@ -2,9 +2,9 @@
 
 import ExtendableError from './ExtendableError';
 
-class NotFoundError extends ExtendableError {
+class NotFoundError {
   constructor(item: string, collection: string, id: string) {
-    super(`${item}(${id}) not found`);
+    this.message = `${item}(${id}) not found`;
   }
 }
 

@@ -167,7 +167,7 @@ class Store {
 
       // eslint-disable-next-line no-unused-vars, arrow-body-style
       router.get(`/${name}`, Store.wrapper(async (req, res) => {
-        return collection.find(null, new Context(req, res));
+        return collection.find(req.query, new Context(req, res));
       }));
 
       // eslint-disable-next-line no-unused-vars, arrow-body-style
@@ -178,6 +178,14 @@ class Store {
       // eslint-disable-next-line no-unused-vars, arrow-body-style
       router.post(`/${name}`, Store.wrapper(async (req: express$Request, res: express$Response) => {
         return collection.onHTTPPost(new Context(req, res));
+      }));
+
+      router.put(`/${name}/:${paramName}`, Store.wrapper(async (req: express$Request, res: express$Response) => {
+        return collection.onHTTPPut(req.params[paramName], new Context(req, res));
+      }));
+
+      router.patch(`/${name}/:${paramName}`, Store.wrapper(async (req: express$Request, res: express$Response) => {
+        return collection.onHTTPPatch(req.params[paramName], new Context(req, res));
       }));
 
       collection.schema.fields.forEach((field: Field | LinksField | IDField) => {
