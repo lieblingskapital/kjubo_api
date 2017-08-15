@@ -161,7 +161,7 @@ class Store {
           return next(new NotFoundError(paramName, name, id));
         }
 
-        req.params[paramName] = item || null;
+        req.params[paramName] = item || id;
         return next();
       });
 

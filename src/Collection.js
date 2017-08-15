@@ -121,7 +121,7 @@ class Collection {
       .onUpdate(result.getValues(), context)
       .then((_item) => {
         if (!_item) throw new Error('Item can not be empty');
-        return this.store.db(this.table)
+        return typeof item === 'object' ? this.store.db(this.table)
           .update(Object.keys(_item).reduce((prev, curr) => {
             if (typeof _item[curr] !== 'undefined') {
               // eslint-disable-next-line no-param-reassign
@@ -131,7 +131,17 @@ class Collection {
           }, {}))
           .where('id', item.id)
           .returning('*')
-          .then(tmp => this.onGet(tmp[0], context));
+          .then(tmp => this.onGet(tmp[0], context))
+          : this.store.db(this.table)
+            .insert(Object.keys(_item).reduce((prev, curr) => {
+              if (typeof _item[curr] !== 'undefined') {
+                // eslint-disable-next-line no-param-reassign
+                prev[curr] = _item[curr];
+              }
+              return prev;
+            }, { id: item }))
+            .returning('*')
+            .then(tmp => this.onGet(tmp[0], context))
       });
   }
 
