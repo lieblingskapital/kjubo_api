@@ -157,11 +157,11 @@ class Store {
       // eslint-disable-next-line max-len
       router.param(paramName, async (req: $Request, res: $Response, next: NextFunction, id: string) => {
         const item = await collection.get(id, new Context(req, res));
-        if (!item) {
+        if (!item && req.method !== 'PUT') {
           return next(new NotFoundError(paramName, name, id));
         }
 
-        req.params[paramName] = item;
+        req.params[paramName] = item || null;
         return next();
       });
 
