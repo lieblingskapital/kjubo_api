@@ -101,6 +101,7 @@ class Collection {
           .returning('*')
           .then(tmp => this.onGet(tmp[0], context),
           err => {
+            console.log('CREATE ERROR', err);
             if (err.condition !== 'unique_violation') throw err;
 
             throw new ValidationError({
@@ -187,7 +188,7 @@ class Collection {
   }
 
   async onPatch(item: Object, patch: Object, context: Context): Promise<Object> {
-    return Promise.resolve(item);
+    return Promise.resolve(patch);
   }
 
   onHTTPPost(context: Context) {
