@@ -24,6 +24,10 @@ class Collection {
     this.schema = new Schema(schema);
   }
 
+  emit(event, ...args) {
+    this.store.emit(`${this.table}.${event}`, ...args);
+  }
+
   validate(item: Object): Promise<ValidationResult> {
     return this.schema.validate(item);
   }
@@ -85,9 +89,11 @@ class Collection {
       throw new ValidationError(result.getErrors());
     }
 
+    this.emit('create.before', result.getValues());
     return this
       .onCreate(result.getValues(), context)
       .then((_item) => {
+        this.emit('create', _item);
         if (!_item) throw new Error('Item can not be empty');
         const insert = Object.keys(_item).reduce((prev, curr) => {
           if (typeof _item[curr] !== 'undefined') {
@@ -99,7 +105,11 @@ class Collection {
         return this.store.db(this.table)
           .insert(insert)
           .returning('*')
-          .then(tmp => this.onGet(tmp[0], context),
+          .then(async tmp => {
+            const r = await this.onGet(tmp[0], context);
+            this.emit('created', r);
+            return r;
+          },
           err => {
             console.log('CREATE ERROR', err);
             if (err.condition !== 'unique_violation') throw err;
@@ -118,9 +128,21 @@ class Collection {
       throw new ValidationError(result.getErrors());
     }
 
+    if (typeof item === 'object') {
+      this.emit('update.before', item, result.getValues());
+    } else {
+      this.emit('create.before', result.getValues(), item);
+    }
+
     return this
       .onUpdate(result.getValues(), context)
       .then((_item) => {
+        if (typeof item === 'object') {
+          this.emit('update', item, _item);
+        } else {
+          this.emit('create', _item, item);
+        }
+
         if (!_item) throw new Error('Item can not be empty');
         return typeof item === 'object' ? this.store.db(this.table)
           .update(Object.keys(_item).reduce((prev, curr) => {
@@ -132,7 +154,11 @@ class Collection {
           }, {}))
           .where('id', item.id)
           .returning('*')
-          .then(tmp => this.onGet(tmp[0], context))
+          .then(async tmp => {
+            const r = await this.onGet(tmp[0], context);
+            this.emit('updated', item, r);
+            return r;
+          })
           : this.store.db(this.table)
             .insert(Object.keys(_item).reduce((prev, curr) => {
               if (typeof _item[curr] !== 'undefined') {
@@ -142,7 +168,11 @@ class Collection {
               return prev;
             }, { id: item }))
             .returning('*')
-            .then(tmp => this.onGet(tmp[0], context))
+            .then(async tmp => {
+              const r = await this.onGet(tmp[0], context);
+              this.emit('created', item, r);
+              return r;
+            });
       });
   }
 
@@ -153,9 +183,11 @@ class Collection {
       throw new ValidationError(result.getErrors());
     }
 
+    this.emit('patch.before', item, body, result.getValues());
     return this
       .onPatch(item, result.getValues(), context)
       .then((_item) => {
+        this.emit('patch', item, _item);
         if (!_item) throw new Error('Item can not be empty');
         const patch = Object.keys(_item).reduce((prev, curr) => {
           if (typeof _item[curr] !== 'undefined') {
@@ -169,7 +201,11 @@ class Collection {
           .update(patch)
           .where('id', item.id)
           .returning('*')
-          .then(tmp => this.onGet(tmp[0], context));
+          .then(async tmp => {
+            const r = await this.onGet(tmp[0], context);
+            this.emit('updated', item, r);
+            return r;
+          });
       });
   }
 

@@ -4,6 +4,7 @@ import type { Knex } from 'knex';
 import jwt from 'jsonwebtoken';
 import type { Router, $Request, $Response, NextFunction } from 'express';
 import { IDField, LinksField } from '@kjubo/schema';
+import { EventEmitter2 } from 'eventemitter2';
 
 import Collection from './Collection';
 import Context from './Context';
@@ -12,7 +13,7 @@ import ValidationError from './errors/ValidationError';
 import DatabaseError from './errors/DatabaseError';
 import NotFoundError from './errors/NotFoundError';
 
-class Store {
+class Store extends EventEmitter2 {
   collections: Map<string, Collection> = new Map();
   names: Map<string, string> = new Map();
   db: Knex;
@@ -20,6 +21,7 @@ class Store {
   static JWT_SECRET = 'cQX[yD{_/%tv,f]zS9_O#~;h)o6{;@[G@as^/k^?<0qX@v7X=.<<k>pfI!(Cn$d';
 
   constructor(db: Knex) {
+    super();
     this.db = db;
   }
 
@@ -43,6 +45,7 @@ class Store {
     return async (req, res, next) => {
       try {
         const result = await handler(req, res);
+        if(res.headersSent) return;
         return res.status(200).json({
           status: 200,
           limit: result ? result.limit : undefined,
