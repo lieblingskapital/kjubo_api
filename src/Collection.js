@@ -78,6 +78,27 @@ class Collection {
       .then((result) => { result.offset = offset; result.limit = limit; return result; });
   }
 
+  count(query?: ?Object, context: Context): Promise<Array<Object>> {
+    let tmp = this.query().count('id');
+
+    if (query) {
+      Array.from(this.schema.fields.keys()).forEach((field) => {
+        if (typeof query[field] === 'undefined') return;
+
+        const operator = query[field][0];
+        if (operator === '%') {
+          tmp.where(field, '%', query[field].substring(1));
+        } else {
+          tmp.where(field, query[field]);
+        }
+      });
+    }
+
+    return tmp.then((result) => {
+      return parseInt(result[0].count);
+    });
+  }
+
   query() {
     return this.store.db(this.table);
   }

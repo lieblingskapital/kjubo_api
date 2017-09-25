@@ -45,7 +45,7 @@ class Store extends EventEmitter2 {
     return async (req, res, next) => {
       try {
         const result = await handler(req, res);
-        if(res.headersSent) return;
+        if (res.headersSent) return;
         return res.status(200).json({
           status: 200,
           limit: result ? result.limit : undefined,
@@ -170,7 +170,9 @@ class Store extends EventEmitter2 {
 
       // eslint-disable-next-line no-unused-vars, arrow-body-style
       router.get(`/${name}`, Store.wrapper(async (req, res) => {
-        return collection.find(req.query, new Context(req, res));
+        return req.query.count && ['1', 'true'].indexOf(req.query.count) !== -1
+          ? collection.count(req.query, new Context(req, res))
+          : collection.find(req.query, new Context(req, res));
       }));
 
       // eslint-disable-next-line no-unused-vars, arrow-body-style
