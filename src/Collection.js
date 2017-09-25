@@ -48,7 +48,7 @@ class Collection {
 
   find(query?: ?Object, context: Context): Promise<Array<Object>> {
     const { offset = 0, limit = 100, sort = this.default_sort } = context.req.query;
-    let tmp = this.store.db(this.table).select('*').limit(limit).offset(offset);
+    let tmp = this.findQuery().limit(limit).offset(offset);
 
     if (sort) {
       if (sort[0] === '-') {
@@ -78,8 +78,8 @@ class Collection {
       .then((result) => { result.offset = offset; result.limit = limit; return result; });
   }
 
-  count(query?: ?Object, context: Context): Promise<Array<Object>> {
-    let tmp = this.query().count('id');
+  async count(query?: ?Object, context: Context): Promise<Array<Object>> {
+    let tmp = this.countQuery().count('id');
 
     if (query) {
       Array.from(this.schema.fields.keys()).forEach((field) => {
@@ -101,6 +101,14 @@ class Collection {
 
   query() {
     return this.store.db(this.table);
+  }
+
+  findQuery() {
+    return this.query().select('*');
+  }
+
+  countQuery() {
+    return this.findQuery();
   }
 
   async create(item: Object, context: Context) {
