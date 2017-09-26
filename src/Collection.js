@@ -108,7 +108,7 @@ class Collection {
   }
 
   countQuery() {
-    return this.findQuery();
+    return this.query();
   }
 
   async create(item: Object, context: Context) {
