@@ -1,5 +1,5 @@
 {
-  "name": "@lieblingskapital/api",
+  "name": "@lieblingskapital/kjubo_api",
   "version": "1.0.0",
   "description": "express middleware for fast and easy api creation",
   "main": "lib/index.js",
