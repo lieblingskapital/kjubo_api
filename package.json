@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kjubo/api.git"
+    "url": "git+https://github.com/lieblingskapital/kjubo_api.git"
   },
   "author": "Jan Scheffler",
   "license": "MIT",
@@ -33,7 +33,7 @@
     ]
   },
   "bugs": {
-    "url": "https://github.com/kjubo/api/issues"
+    "url": "https://github.com/lieblingskapital/kjubo_api/issues"
   },
   "homepage": "https://github.com/kjubo/api#readme",
   "devDependencies": {
