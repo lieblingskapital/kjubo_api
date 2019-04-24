@@ -1,5 +1,5 @@
 {
-  "name": "@lieblingskapital/kjubo_api",
+  "name": "@kjubo/api",
   "version": "1.0.0",
   "description": "express middleware for fast and easy api creation",
   "main": "lib/index.js",
@@ -35,7 +35,7 @@
   "bugs": {
     "url": "https://github.com/lieblingskapital/kjubo_api/issues"
   },
-  "homepage": "https://github.com/lieblingskapital/kjubo_api#readme",
+  "homepage": "https://github.com/kjubo/api#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
