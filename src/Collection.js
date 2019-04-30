@@ -96,7 +96,11 @@ var Collection = function () {
           if (operator === '%') {
             tmp.where(field, 'like', '%'+query[field].substring(1)+'%');
           }else if (operator === '-') {
+        	  if(query[field].substring(1)=='null'){
+        		  tmp.whereNotNull(field);
+        	  }else{
             tmp.whereNot(field, query[field].substring(1));
+        	  }
           } else {
             tmp.where(field, query[field]);
           }
@@ -128,10 +132,16 @@ var Collection = function () {
 
           var operator = query[field][0];
           if (operator === '%') {
-        	  tmp.where(field, 'like', '%'+query[field].substring(1)+'%');
-          } else {
-            tmp.where(field, query[field]);
-          }
+              tmp.where(field, 'like', '%'+query[field].substring(1)+'%');
+          }else if (operator === '-') {
+          	if(query[field].substring(1)=='null'){
+          		tmp.whereNotNull(field);
+          	}else{
+              tmp.whereNot(field, query[field].substring(1));
+          	  }
+           } else {
+              tmp.where(field, query[field]);
+           }
         });
       }
 
