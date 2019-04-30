@@ -95,6 +95,8 @@ var Collection = function () {
           var operator = query[field][0];
           if (operator === '%') {
             tmp.where(field, 'like', '%'+query[field].substring(1)+'%');
+          }else if (operator === '-') {
+            tmp.whereNot(field, query[field].substring(1));
           } else {
             tmp.where(field, query[field]);
           }
