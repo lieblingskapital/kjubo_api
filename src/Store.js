@@ -192,6 +192,10 @@ class Store extends EventEmitter2 {
       router.patch(`/${name}/:${paramName}`, Store.wrapper(async (req: express$Request, res: express$Response) => {
         return collection.onHTTPPatch(req.params[paramName], new Context(req, res));
       }));
+      
+      router.delete(`/${name}/:${paramName}`, Store.wrapper(async function (req, res) {
+      	return collection.onHTTPDelete(req.params[paramName], new _Context2.default(req, res));
+      }));
 
       collection.schema.fields.forEach((field: Field | LinksField | IDField) => {
         if (field instanceof IDField) {
