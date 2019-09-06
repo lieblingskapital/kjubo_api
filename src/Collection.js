@@ -94,7 +94,10 @@ var Collection = function () {
 
           var operator = query[field][0];
           if (operator === '%') {
-            tmp.where(field, 'like', '%'+query[field].substring(1)+'%');
+            tmp.where(field, 'like', '%'+query[field].substring(1)+'%'); 
+          } else if (operator === '$') {
+        	  tmp.whereRaw('LOWER('+field+') like ?', query[field].substring(1).toLowerCase());
+        	  
           }else if (operator === '-') {
         	  if(query[field].substring(1)=='null'){
         		  tmp.whereNotNull(field);
@@ -133,6 +136,9 @@ var Collection = function () {
           var operator = query[field][0];
           if (operator === '%') {
               tmp.where(field, 'like', '%'+query[field].substring(1)+'%');
+          } else if (operator === '$') {
+        	  tmp.whereRaw('LOWER('+field+') like ?', query[field].substring(1).toLowerCase());
+        	  
           }else if (operator === '-') {
           	if(query[field].substring(1)=='null'){
           		tmp.whereNotNull(field);
