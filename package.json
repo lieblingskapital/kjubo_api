@@ -62,7 +62,7 @@
     "@kjubo/schema": "^1.2.1",
     "eventemitter2": "^4.1.2",
     "jsonwebtoken": "^7.4.3",
-    "knex": "^0.13.0",
+    "knex": "^0.19.5",
     "pg-error": "^1.0.0"
   }
 }
