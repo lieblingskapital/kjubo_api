@@ -127,7 +127,7 @@ var Collection = function () {
   }, {
     key: 'count',
     value: async function count(query, context) {
-      var tmp = this.countQuery(query, context).count('id');
+      var tmp = this.countQuery(query, context).count('*');
 
       if (query) {
         Array.from(this.schema.fields.keys()).forEach(function (field) {
