@@ -1,4 +1,4 @@
-// @flow
+//@flow
 
 export { default as Store } from './Store';
 export { default as Collection } from './Collection';
