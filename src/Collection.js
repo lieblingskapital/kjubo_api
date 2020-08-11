@@ -102,6 +102,12 @@ var Collection = function () {
 						}else{
 							tmp.whereNot(field, query[field].substring(1));
 						}
+				  } else if (operator === '>') {
+						
+						tmp.where(field,'>', query[field].substring(1));
+					}else if (operator === '<') {
+						
+						tmp.where(field,'<', query[field].substring(1));
 					} else {
 						tmp.where(field, query[field]);
 					}
@@ -143,6 +149,12 @@ var Collection = function () {
 						}else{
 							tmp.whereNot(field, query[field].substring(1));
 						}
+				  } else if (operator === '>') {
+						
+						tmp.where(field,'>', query[field].substring(1));
+					}else if (operator === '<') {
+						
+						tmp.where(field,'<', query[field].substring(1));
 					} else {
 						tmp.where(field, query[field]);
 					}
